@@ -6,109 +6,23 @@
   <title>Make shopping smarter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-		*{
-				box-sizing:border-box;
-				margin:0;
-		}
-    body {
-      font-family: Arial, sans-serif;
-    		text-align:center;
-}
-		header{
-				background:pink;
-				padding:10px;
-				font-size:30px;
-				font-weight:bold;
-		}
-.item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 0.1em;
-      flex-wrap: wrap;
-		     background-color:pink;
-		     padding:5px;
-		border-radius:10px;
-}
-.item input[type="text"],
-.item input[type="number"],
-.item select {
-      margin-right: 0.5em;
-		    margin:2px;
-      margin-bottom: 0.5em;
-		    padding:10px;
-		    border-radius:5px;
-		    width:100%;
-}
-.item input[type="file"] {
-      margin-right: 0.5em;
-}
-.item img {
-      height: 80px;
-      margin-right: 100px;
-		border-radius:5px;
-}
-.item button {
-      margin-left: 0.2em;
-      margin-bottom: 0.5em;
-		padding:10px;
-}
-    #addItem {
-      margin-top: 1em;
-    		background-color:grey;
-    		padding:10px;
-    		margin:10px;
-    		border-radius:10px;
-}
-.floating-card,.total-card {
-      position: fixed;
-      background: green;
-		color:white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-.floating-card {
-      top: 2px;
-      right: 2px;
-}
-.total-card {
-      bottom: 2px;
-      left: 2px;
-}
-    #controls {
-      margin-top: 2em;
-}
-    #controls button {
-      margin-right: 1em;
-      margin-bottom: 1em;
-    		padding:10px;
-}
-		input{
-				width:100%;
-				border:0;
-				padding:10px;
-				border-radius:5px;
-				margin:2px;
-				
-		}
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <header>🛒 Shopping List</header>
+  <header>🛒 Smart list</header>
 
   <div id="addItem">
     <input type="text" id="newItemName" placeholder="Item name">
     <input type="number" id="newItemPrice" placeholder="Price" min="0" step="0.01">
-    <select id="newItemCategory">
-      <option value="Groceries">Groceries</option>
-      <option value="Electronics">Electronics</option>
-      <option value="Clothing">Clothing</option>
-      <option value="Other">Other</option>
-    </select>
-    <input type="file" id="newItemImage" accept="image/*">
-    <button onclick="addItem()">Add Item</button>
+     <input type="number" id="newItemQuantity" placeholder="Quantity" min="1" value="1">
+     <select id="newItemCategory">
+       <option value="Groceries">Groceries</option>
+       <option value="Electronics">Electronics</option>
+       <option value="Clothing">Clothing</option>
+       <option value="Other">Other</option>
+     </select>
+     <button onclick="addItem()">Add Item</button>
   </div>
 		<div id="list"></div>
   <div id="controls">
@@ -117,203 +31,39 @@
     <button onclick="createReceipt()">🧾 Create Receipt</button>
   </div>
 
-  <div class="floating-card" id="checkedTotalCard" style="display:none;">
-    ✅ Checked Total =  UGX:<span id="checkedTotal">0.0</span>
+  <div id="bottomNav">
+    <div class="total-card" id="checkedTotalCard" style="display:none;background-color:blue;">
+      ✅ Receipt Total  UGX: <span id="checkedTotal">0.0</span>
+    </div>
+
+    <div class="total-card">
+      💰 Total List Value   UGX: <span id="listTotal">0.0</span>
+    </div>
   </div>
 
-  <div class="total-card">
-    💰 Total List Value  =   UGX:<span id="listTotal">0.0</span>
+
+  <div id="receiptModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Receipt Options</h2>
+      <button onclick="downloadReceipt()">Download PDF</button>
+      <button onclick="showWhatsAppInput()" style="background-color: green;color: white;">Send to WhatsApp</button>
+      <button onclick="closeReceiptModal()" style="background-color: red;color: white;">Cancel</button>
+    </div>
   </div>
 
-  <script>
-    let items = [];
+  <div id="whatsappModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Send to WhatsApp</h2>
+      <input type="text" id="whatsappNumber" placeholder="Enter phone number (e.g. 0744759181)">
+      <button onclick="sendToWhatsApp()" style="background-color: green; color: white;">Send</button>
+      <button onclick="closeWhatsAppModal()" style="background-color: red;color: white;">Cancel</button>
+    </div>
+  </div>
 
-    function loadItems() {
-      const saved = localStorage.getItem('shoppingList');
-      if (saved) items = JSON.parse(saved);
-}
 
-    function saveItems() {
-      localStorage.setItem('shoppingList', JSON.stringify(items));
-}
 
-    function addItem() {
-      const name = document.getElementById('newItemName').value.trim();
-      const price = parseFloat(document.getElementById('newItemPrice').value);
-      const category = document.getElementById('newItemCategory').value;
-      const imageInput = document.getElementById('newItemImage');
-      if (!name || isNaN(price)) return;
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const image = e.target.result;
-        items.push({ name, price, category, image, checked: false});
-        saveItems();
-        renderList();
-};
-      if (imageInput.files[0]) {
-        reader.readAsDataURL(imageInput.files[0]);
-} else {
-        items.push({ name, price, category, image: null, checked: false});
-        saveItems();
-        renderList();
-}
-
-      document.getElementById('newItemName').value = '';
-    		document.getElementById('newItemPrice').value = '';
-      document.getElementById('newItemImage').value = '';
-}
-
-    function renderList() {
-      const list = document.getElementById('list');
-      list.innerHTML = '';
-      items.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'item';
-
-        if (item.image) {
-          const img = document.createElement('img');
-          img.src = item.image;
-          div.appendChild(img);
-}
-
-        const nameInput = document.createElement('input');
-        nameInput.type = 'text';
-        nameInput.value = item.name;
-        nameInput.onchange = e => {
-          items[index].name = e.target.value;
-          saveItems();
-};
-
-        const priceInput = document.createElement('input');
-        priceInput.type = 'number';
-        priceInput.value = item.price.toFixed(1);
-        priceInput.onchange = e => {
-          items[index].price = parseFloat(e.target.value);
-          saveItems();
-          updateTotals();
-};
-
-        const categorySelect = document.createElement('select');
-        ["Groceries", "Electronics", "Clothing", "Other"].forEach(cat => {
-          const opt = document.createElement('option');
-          opt.value = cat;
-          opt.textContent = cat;
-          if (item.category === cat) opt.selected = true;
-          categorySelect.appendChild(opt);
-});
-        categorySelect.onchange = e => {
-          items[index].category = e.target.value;
-          saveItems();
-};
-
-        const checkBtn = document.createElement('button');
-        checkBtn.textContent = item.checked? 'Unmark': 'Mark as bought';
-        checkBtn.onclick = () => {
-          items[index].checked =!items[index].checked;
-          saveItems();
-          updateTotals();
-          renderList();
-};
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete item';
-        deleteBtn.onclick = () => {
-          items.splice(index, 1);
-          saveItems();
-          updateTotals();
-          renderList();
-};
-
-        div.appendChild(nameInput);
-        div.appendChild(priceInput);
-        div.appendChild(categorySelect);
-        div.appendChild(checkBtn);
-        div.appendChild(deleteBtn);
-        list.appendChild(div);
-});
-
-      updateTotals();
-}
-
-    function updateTotals() {
-      const checkedTotal = items.filter(i => i.checked).reduce((sum, i) => sum + i.price, 0);
-      const listTotal = items.reduce((sum, i) => sum + i.price, 0);
-      document.getElementById('checkedTotal').textContent = checkedTotal.toFixed(1);
-      document.getElementById('listTotal').textContent = listTotal.toFixed(1);
-      document.getElementById('checkedTotalCard').style.display = checkedTotal> 0? 'block': 'none';
-}
-
-    function shareApp() {
-      navigator.clipboard.writeText(window.location.href="https://orionhub.netlify.app/").then(() => {
-        alert("App link copied to clipboard!");
-});
-}
-
-    function openInApp() {
-      if (window.matchMedia('(window.location.href="https://orionhub.netlify.app/")').matches) {
-        alert("You're already using the app!");
-} else {
-        window.location.href="https://orionhub.netlify.app/";
-}
-}
-
-    async function exportToPDF() {
-      const { jsPDF} = window.jspdf;
-      const doc = new jsPDF({ format: "a4"});
-      doc.setFontSize(16);
-      doc.text("Full Shopping List", 20, 20);
-      let y = 30;
-      items.forEach(item => {
-        doc.setFontSize(12);
-        doc.text(`• ${item.name} - UGX${item.price.toFixed(1)} (${item.category})`, 20, y);
-        y += 10;
-});
-      doc.save("shopping-list.pdf");
-}
-
-    async function createReceipt() {
-      const { jsPDF} = window.jspdf;
-      const doc = new jsPDF({ format: "a4"});
-      doc.setFontSize(16);
-      doc.text("Receipt From ORION", 20, 20);
-      doc.setFontSize(12);
-      let y = 30;
-      const checkedItems = items.filter(item => item.checked);
-      if (checkedItems.length === 0) {
-        alert("No items are checked.");
-        return;
-}
-
-      // Table headers
-      doc.text("Item", 20, y);
-      doc.text("Category", 80, y);
-      doc.text("Price (UGX)", 140, y);
-      y += 10;
-
-      doc.setLineWidth(0.5);
-      doc.line(20, y, 190, y);
-      y += 10;
-
-      let total = 0;
-      checkedItems.forEach(item => {
-        doc.text(item.name, 20, y);
-        doc.text(item.category, 80, y);
-        doc.text(item.price.toFixed(1), 140, y);
-        total += item.price;
-        y += 10;
-});
-
-      y += 10;
-      doc.setFontSize(14);
-      doc.text(`Total: UGX${total.toFixed(1)}`, 20, y);
-
-      doc.save("orion receipts.pdf");
-}
-
-    loadItems();
-    renderList();
-  </script>
-		<br><br><br><br>
+  <script src="script.js"></script>
+		<br><br><br><br><br><br><br><br><br><br><br><br><br>
 </body>
 </html>
