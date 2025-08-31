@@ -1,0 +1,161 @@
+*{
+				box-sizing:border-box;
+				margin:0;
+		}
+    body {
+      font-family: Arial, sans-serif;
+      text-align:center;
+	  background-color: white;
+}
+		header{
+				background:rgb(12, 65, 2);
+				padding:10px;
+				font-size:30px;
+				font-weight:bold;
+				color: white;
+		}
+.item {
+       display: flex;
+       margin: 2px;
+ 	  border-left: 5px rgb(255, 0, 0) solid;
+       flex-wrap: wrap;
+ 	  background-color:pink;
+       border-radius:10px;
+ 	  max-width: 400px;
+         ;
+}
+.item.editing {
+       background-color: red;
+}
+.item input[type="text"],
+.item input[type="number"],
+.item select {
+		    padding:10px;
+		    border-radius:5px;
+		    width:max-content;
+.item span {
+    padding:8px;
+    border-radius:5px;
+    margin:2px;
+    display:inline-block;
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.item h3 {
+    font-weight: bold;
+    margin: 0;
+    text-align: center;
+    padding: 5px;
+    font-size: 1.2em;
+}
+}
+.item button {
+      margin-left: 0.2em;
+      margin-bottom: 0.5em;
+		padding:10px;
+}
+    #addItem {
+            margin-top: 1em;
+    		background-color:rgba(13, 122, 19, 0.267);
+    		padding:10px;
+    		margin:10px;
+    		border-radius:10px;
+}
+.total-card {
+       background: green;
+ 	color:white;
+       padding: 5px;
+       border-radius: 8px;
+       margin: 2px;
+       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+button{
+       padding:5px 20px;
+       border-radius:5px;
+       border:0;
+
+}
+#bottomNav {
+       position: fixed;
+       bottom: 0;
+       left: 0;
+       right: 0;
+       display: flex;
+       justify-content: space-around;
+       background: rgba(13, 122, 19, 0.267);
+       padding: 10px;
+       border-top: 1px solid #ccc;
+}
+.modal {
+       position: fixed;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100%;
+       background: rgba(0,0,0,0.5);
+       display: flex;
+       justify-content: center;
+       align-items: center;
+}
+.modal-content {
+       background: white;
+       padding: 20px;
+       border-radius: 10px;
+       width: 300px;
+}
+    #controls {
+      margin-top: 2em;
+}
+    #controls button {
+      margin-right: 1em;
+      margin-bottom: 1em;
+    		padding:10px;
+}
+		input{
+				width:100%;
+				border:0;
+				padding:10px;
+				border-radius:5px;
+				margin:2px;
+				
+		}
+              .item-total {
+                font-weight: bold;
+                width: 100%;
+                color: rgb(151, 13, 13);
+                text-align: left;
+                margin-left: 10px;
+              }
+              .item-name {
+                color: rgb(0, 0, 0);
+                width: 100%;
+                background-color: rgba(13, 122, 19, 0.267);
+                text-transform: uppercase;
+                border-radius: 10px 10px 0 0;
+                
+              }
+              .item-category {
+                font-style: italic;
+                color: rgb(80, 80, 80);
+                width: 100%;
+                text-align: left;
+                margin-left: 10px;
+              }
+              .save-btn {
+                background-color: rgb(0, 13, 128);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+              }
+              .item-quantity {
+                margin-left: 10px;
+              }
+              .item-price {
+                margin-left: 10px;
+              }
